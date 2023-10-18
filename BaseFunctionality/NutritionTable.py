@@ -1,7 +1,7 @@
 import random
 import sys
 
-from HelperFunctions import *
+from BaseFunctionality.HelperFunctions import *
 
 
 class NutritionTable:

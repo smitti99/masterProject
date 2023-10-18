@@ -1,4 +1,4 @@
-from Grid import *
+from BaseFunctionality.Grid import *
 
 
 def set_values_test():
@@ -57,8 +57,24 @@ def cell_step_test():
     print("Cell Step successful")
 
 
+def grid_step_test():
+    G = Grid()
+    for i in range(5):
+        for k in range(5):
+            G.set_cell_data(i, k, Plant(0, 0, 1, 5, 1, NutritionTable(0, 0, 0)), NutritionTable(2, 2, 2))
+    G.set_cell_data(2, 2, Plant(1, 0, 2, 5, 2, NutritionTable(25, 25, 25)), None)
+    G.step(1)
+    for i in range(5):
+        for k in range(5):
+            dictionary = G.cells[i][k].nutrition.dir
+            for key in dictionary.keys():
+                if dictionary[key] != 1:
+                    raise ValueError("Grid step failed")
+    print("Grid Step successful")
+
 if __name__ == "__main__":
     set_values_test()
     plant_step_test()
     absorb_nutrition_test()
     cell_step_test()
+    grid_step_test()

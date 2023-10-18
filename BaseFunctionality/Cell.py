@@ -1,5 +1,5 @@
-from NutritionTable import NutritionTable
-from Plant import Plant
+from BaseFunctionality.NutritionTable import NutritionTable
+from BaseFunctionality.Plant import Plant
 
 
 class Cell:

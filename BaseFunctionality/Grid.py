@@ -1,9 +1,10 @@
 import math
 import random
+import time
 
-from Plant import *
-from Cell import *
-from NutritionTable import NutritionTable
+from BaseFunctionality.Plant import *
+from BaseFunctionality.Cell import *
+from BaseFunctionality.NutritionTable import NutritionTable
 
 
 class Grid:
@@ -68,6 +69,11 @@ class Grid:
 if __name__ == "__main__":
     random.seed(123)
     G = Grid()
-    G.step(0.1)
+    start = time.time()
+    for i in range(1000):
+        G.step(0.1)
+    stop = time.time()
+    elapsed_time = stop - start
+    print(f"Elapsed time: {elapsed_time} seconds")
     G.cells[0][0].plant.nutritionNeed.set([1, 1, 1])
     print(len(G.p_list.keys()))

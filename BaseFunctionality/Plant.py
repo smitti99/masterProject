@@ -1,4 +1,6 @@
-from NutritionTable import NutritionTable
+import json
+
+from BaseFunctionality.NutritionTable import NutritionTable
 
 
 class Plant:
@@ -47,7 +49,20 @@ class Plant:
 
 
 def create_plant_list():
-    p_list = {(0, 0): Plant(0, 0, 1, 1, 5, NutritionTable(1, 1, 1)),
-              (1, 1): Plant(0, 1, 1, 1, 1, NutritionTable(2, 2, 2))}
+    # (id, GrowStep) : Plant(Id,GrowStep,Range,TimeToGrow,Harvest,Nutrition)
+    f = open('JsonFiles/PlantList.json')
+    p_list = {}
+    data = json.load(f)
+    for id in data.keys():
+        for gs in data[id].keys():
+            values = data[id][gs].split(",")
+            p_list.update({(int(id), int(gs)): Plant(int(id), int(gs), int(values[0]), float(values[1]),
+                                                     float(values[2]),
+                                                     NutritionTable(float(values[3]), float(values[4]),
+                                                                    float(values[5])))})
 
-    return p_list, 1
+
+    print(p_list.keys())
+    print(p_list[(0,0)])
+
+    return p_list, 2
