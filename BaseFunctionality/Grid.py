@@ -65,6 +65,19 @@ class Grid:
         if nutrition != None:
             self.cells[x][y].set_nutrition(nutrition)
 
+    def log_nutrition_to_file(self, file_name):
+        with open("../Logs/" + file_name+".json", "w") as f:
+            data = {}
+            size = len(self.cells)
+            keys = self.cells[0][0].nutrition.dir.keys()
+            for key in keys:
+                data.update({key: [[0 for i in range(size)]for i in range(size)]})
+            for x in range(size):
+                for y in range(size):
+                    for key in keys:
+                        data[key][x][y] = self.cells[x][y].nutrition.dir[key]
+            json.dump(data, f)
+
 
 if __name__ == "__main__":
     random.seed(123)
@@ -72,6 +85,7 @@ if __name__ == "__main__":
     start = time.time()
     for i in range(1000):
         G.step(0.1)
+    G.log_nutrition_to_file("Test")
     stop = time.time()
     elapsed_time = stop - start
     print(f"Elapsed time: {elapsed_time} seconds")

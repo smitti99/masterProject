@@ -50,7 +50,7 @@ class Plant:
 
 def create_plant_list():
     # (id, GrowStep) : Plant(Id,GrowStep,Range,TimeToGrow,Harvest,Nutrition)
-    f = open('JsonFiles/PlantList.json')
+    f = open('../JsonFiles/PlantList.json')
     p_list = {}
     data = json.load(f)
     for id in data.keys():
