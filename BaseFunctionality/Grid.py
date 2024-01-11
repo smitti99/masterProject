@@ -1,7 +1,9 @@
+import json
 import math
 import random
 import time
 
+import GlobalConfig
 from BaseFunctionality.Plant import *
 from BaseFunctionality.Cell import *
 from BaseFunctionality.NutritionTable import NutritionTable
@@ -10,9 +12,15 @@ from BaseFunctionality.NutritionTable import NutritionTable
 class Grid:
 
     def step(self, time_multiplier):
+        if GlobalConfig.log_nutrition:
+            self.log_nutrition()
+        if GlobalConfig.log_yield:
+            self.log_yield()
         for row in self.cells:
             for cell in row:
                 cell.step(time_multiplier)
+        GlobalConfig.global_step += 1
+        GlobalConfig.global_step_char = "'" + str(GlobalConfig.global_step) + "'"
 
     def get_neighbour_nutrition(self, pos, distance):
         nutrition = NutritionTable()
@@ -58,6 +66,15 @@ class Grid:
             for i in range(len(self.cells)):
                 for j in range(len(self.cells[0])):
                     self.cells[i][j] = premade_cells[i][j]
+        elif len(args)== 2:
+            nutritions = args[0]
+            plants = args[1]
+            self.cells = [[object for i in range(5)] for i in range(5)]
+            for i in range(5):
+                for j in range(5):
+                    self.cells[i][j] = Cell(i, j, self.p_list, plants[i][j], self)
+                    self.cells[i][j].nutrition.set_dir(nutritions[i][j])
+        GlobalConfig.size = len(self.cells)
 
     def set_cell_data(self, x, y, plant, nutrition):
         if plant != None:
@@ -65,29 +82,39 @@ class Grid:
         if nutrition != None:
             self.cells[x][y].set_nutrition(nutrition)
 
-    def log_nutrition_to_file(self, file_name):
-        with open("../Logs/" + file_name+".json", "w") as f:
-            data = {}
-            size = len(self.cells)
-            keys = self.cells[0][0].nutrition.dir.keys()
-            for key in keys:
-                data.update({key: [[0 for i in range(size)]for i in range(size)]})
-            for x in range(size):
-                for y in range(size):
-                    for key in keys:
-                        data[key][x][y] = self.cells[x][y].nutrition.dir[key]
-            json.dump(data, f)
+    def log_nutrition(self):
+        file_name = GlobalConfig.log_path + "/nutrition.json"
+        try:
+            with open(file_name) as f:
+                js = json.load(f)
+        except:
+            js = {}
+        data = {}
+        size = len(self.cells)
+        keys = self.cells[0][0].nutrition.dir.keys()
+        for key in keys:
+            data.update({key: [[0 for i in range(size)] for i in range(size)]})
+        for x in range(size):
+            for y in range(size):
+                for key in keys:
+                    data[key][x][y] = self.cells[x][y].nutrition.dir[key]
 
+        js.update({GlobalConfig.global_step: data})
+        with open(file_name, "w") as f:
+            json.dump(js, f)
 
-if __name__ == "__main__":
-    random.seed(123)
-    G = Grid()
-    start = time.time()
-    for i in range(1000):
-        G.step(0.1)
-    G.log_nutrition_to_file("Test")
-    stop = time.time()
-    elapsed_time = stop - start
-    print(f"Elapsed time: {elapsed_time} seconds")
-    G.cells[0][0].plant.nutritionNeed.set([1, 1, 1])
-    print(len(G.p_list.keys()))
+    def log_yield(self):
+        file_name = GlobalConfig.log_path + "/yield.json"
+        try:
+            with open(file_name) as f:
+                js = json.load(f)
+                if not GlobalConfig.global_step_char in js or \
+                        len(js[GlobalConfig.global_step_char]) >= GlobalConfig.size * GlobalConfig.size:
+                    js.update({GlobalConfig.global_step_char: []})
+        except:
+            js = {GlobalConfig.global_step_char: []}
+        for row in self.cells:
+            for cell in row:
+                js[GlobalConfig.global_step_char].append(cell.plant.harvest)
+        with open(file_name,"w") as f:
+            json.dump(js, f)

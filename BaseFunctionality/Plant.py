@@ -1,5 +1,6 @@
 import json
 
+import GlobalConfig
 from BaseFunctionality.NutritionTable import NutritionTable
 
 
@@ -12,10 +13,31 @@ class Plant:
     nutritionNeed = NutritionTable()
 
     def step(self, time_multiplier, nutritions):
-        rate = nutritions.get_min_rate(self.nutritionNeed * time_multiplier)
-        if rate > 1:
-            rate = 1
-        self.timeToGrow -= rate
+
+
+        try:
+            with open(GlobalConfig.log_path + "/growth.json") as f:
+                js = json.load(f)
+                if not GlobalConfig.global_step_char in js or \
+                        len(js[GlobalConfig.global_step_char]) >= GlobalConfig.size * GlobalConfig.size:
+                    js.update({GlobalConfig.global_step_char: []})
+        except:
+            js = {GlobalConfig.global_step_char: []}
+        if self.timeToGrow >= 0:
+            rate = nutritions.get_min_rate(self.nutritionNeed * time_multiplier)
+            if rate * time_multiplier >= self.timeToGrow:
+                rate = self.timeToGrow / time_multiplier
+            rate = min(rate, 1)
+            self.timeToGrow -= rate * time_multiplier
+            js[GlobalConfig.global_step_char].append(rate)
+        else:
+            rate = 0
+            js[GlobalConfig.global_step_char].append(0)
+
+        if GlobalConfig.log_growth:
+            with open(GlobalConfig.log_path + "/growth.json", "w") as f:
+                json.dump(js, f)
+
         return self.nutritionNeed * time_multiplier * rate
 
     def full_init(self, args):
@@ -50,7 +72,7 @@ class Plant:
 
 def create_plant_list():
     # (id, GrowStep) : Plant(Id,GrowStep,Range,TimeToGrow,Harvest,Nutrition)
-    f = open('../JsonFiles/PlantList.json')
+    f = open('JsonFiles/PlantList.json')
     p_list = {}
     data = json.load(f)
     for id in data.keys():
@@ -60,9 +82,4 @@ def create_plant_list():
                                                      float(values[2]),
                                                      NutritionTable(float(values[3]), float(values[4]),
                                                                     float(values[5])))})
-
-
-    print(p_list.keys())
-    print(p_list[(0,0)])
-
-    return p_list, 2
+    return p_list, len(data.keys())

@@ -5,13 +5,11 @@ from BaseFunctionality.Plant import Plant
 class Cell:
 
     def step(self, time_multiplier):
-        if self.plant.timeToGrow == -1:
-            return
         neighbour_nutrition = self.grid.get_neighbour_nutrition(self.position, self.plant.absorbRange)
         absorb = self.plant.step(time_multiplier, neighbour_nutrition)
         if self.plant.timeToGrow <= 0:
             try:
-                self.plant = self.plant_list[self.plant.ID, self.plant.growStep + 1]
+                self.plant = Plant(self.plant_list[(self.plant.ID, self.plant.growStep + 1)].get_args())
             except:
                 self.plant.timeToGrow = -1
         self.grid.absorb_nutrition(self.position, self.plant.absorbRange, absorb)

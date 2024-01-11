@@ -1,8 +1,14 @@
+import json
+import os
+
 import matplotlib
+import numpy
+
 from BaseFunctionality.NutritionTable import *
 import matplotlib.pyplot as plt
 import numpy as np
-import seaborn as sns
+import tkinter as tk
+from tkinter import filedialog
 
 import threading
 
@@ -39,3 +45,47 @@ def show_nutrition(Grid):
     pause_thread.join()
     for fig in fig_lis:
         plt.close(fig)
+
+
+def plot_growth():
+    try:
+        matplotlib.use('TkAgg')
+        root = tk.Tk()
+        root.withdraw()
+        file = filedialog.askopenfilename(title="Select Growth-Log")
+        with open(file) as f:
+            in_data = json.load(f)
+            plot_data = []
+            for key in in_data.keys():
+                plot_data.append(numpy.average(in_data[key]))
+            fig, axs = plt.subplots()
+            axs.set_ylabel("Average-Growth-Rate")
+            axs.set_xlabel("Step")
+            axs.set_ylim([0,1])
+            axs.plot(plot_data)
+            fig.savefig(os.path.join(os.path.dirname(file), "growth_plot"))
+    except Exception as e:
+        print(e)
+        print("No Logs found / Wrong File selected")
+
+
+def plot_yield():
+    try:
+        matplotlib.use('TkAgg')
+        root = tk.Tk()
+        root.withdraw()
+        file = filedialog.askopenfilename(title="Select Yield-Log")
+        with open(file) as f:
+            in_data = json.load(f)
+            plot_data = []
+            for key in in_data.keys():
+                plot_data.append(numpy.average(in_data[key]))
+            fig, axs = plt.subplots()
+            axs.set_ylabel("Average-Yield-Rate")
+            axs.set_xlabel("Step")
+            axs.plot(plot_data)
+            fig.savefig(os.path.join(os.path.dirname(file), "yield_plot"))
+    except Exception as e:
+        print(e)
+        print("No Logs found / Wrong File selected")
+
