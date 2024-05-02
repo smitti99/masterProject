@@ -7,6 +7,10 @@ from BaseFunctionality.HelperFunctions import *
 class NutritionTable:
 
     def __init__(self, *args):
+        """
+        K,P,N
+        :param args:
+        """
         size = -1
         if len(args) > 0:
             size = len(args)
@@ -69,6 +73,12 @@ class NutritionTable:
         for key in self.dir.keys():
             self.dir[key] -= other.dir[key]
         return self
+
+    def __sub__(self, other):
+        out = NutritionTable()
+        for key in self.dir.keys():
+            out.dir[key] = self.dir[key] - other.dir[key]
+        return out
 
     def is_zero(self):
         for key in self.dir:

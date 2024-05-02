@@ -11,14 +11,21 @@ from BaseFunctionality.NutritionTable import NutritionTable
 
 class Grid:
 
+    to_fertilize = False
+    fertilizer = NutritionTable()
+    l_nutrition = GlobalConfig.log_nutrition
+    l_yield = GlobalConfig.log_yield
+    Config_path = GlobalConfig.log_path
+
     def step(self, time_multiplier):
-        if GlobalConfig.log_nutrition:
+        if self.l_nutrition:
             self.log_nutrition()
-        if GlobalConfig.log_yield:
+        if self.l_yield:
             self.log_yield()
         for row in self.cells:
             for cell in row:
                 cell.step(time_multiplier)
+                cell.nutrition += self.fertilizer
         GlobalConfig.global_step += 1
         GlobalConfig.global_step_char = "'" + str(GlobalConfig.global_step) + "'"
 
@@ -74,6 +81,10 @@ class Grid:
                 for j in range(5):
                     self.cells[i][j] = Cell(i, j, self.p_list, plants[i][j], self)
                     self.cells[i][j].nutrition.set_dir(nutritions[i][j])
+
+        self.l_nutrition = GlobalConfig.log_nutrition
+        self.l_yield = GlobalConfig.log_yield
+        self.Config_path = GlobalConfig.log_path
         GlobalConfig.size = len(self.cells)
 
     def set_cell_data(self, x, y, plant, nutrition):
@@ -83,7 +94,7 @@ class Grid:
             self.cells[x][y].set_nutrition(nutrition)
 
     def log_nutrition(self):
-        file_name = GlobalConfig.log_path + "/nutrition.json"
+        file_name = self.Config_path + "/nutrition.json"
         try:
             with open(file_name) as f:
                 js = json.load(f)
@@ -104,7 +115,7 @@ class Grid:
             json.dump(js, f)
 
     def log_yield(self):
-        file_name = GlobalConfig.log_path + "/yield.json"
+        file_name = self.Config_path + "/yield.json"
         try:
             with open(file_name) as f:
                 js = json.load(f)
@@ -118,3 +129,10 @@ class Grid:
                 js[GlobalConfig.global_step_char].append(cell.plant.harvest)
         with open(file_name,"w") as f:
             json.dump(js, f)
+
+    def add_nutrtion(self, nutrition):
+        nutrition_per_cell = nutrition * (1/math.pow(self.size,2))
+        for x in range(self.size):
+            for y in range(self.size):
+                self.cells[x][y].nutrition += nutrition_per_cell
+
