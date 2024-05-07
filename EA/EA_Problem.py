@@ -1,9 +1,13 @@
 import copy
+import datetime
 import gc
+import logging
 import random
+import time
 from tkinter.filedialog import askdirectory
 
-from platypus import Problem, Integer, Real, Variator
+from platypus import Problem, Integer, Real, NSGAII, RandomGenerator, TournamentSelector, MaxEvaluations, \
+    TerminationCondition, nondominated
 
 import GlobalConfig
 from BaseFunctionality import Plant, Grid, NutritionTable, HelperFunctions
@@ -47,7 +51,6 @@ class Field_Optimization(Problem):
         for i in range(GlobalConfig.max_steps):
             g.step(GlobalConfig.time_mult)
 
-
         # evaluate
         nutrition_error = 0
         plant_yield = 0
@@ -65,3 +68,45 @@ class Field_Optimization(Problem):
         gc.collect()
 
 
+class personal_NSGAII(NSGAII):
+    def __init__(self, problem,
+                 population_size=100,
+                 generator=RandomGenerator(),
+                 selector=TournamentSelector(2),
+                 variator=None,
+                 archive=None,
+                 **kwargs):
+        super().__init__(problem, population_size, generator, selector, variator, archive, **kwargs)
+
+    def run(self, condition, callback=None):
+        LOGGER = logging.getLogger("Platypus")
+        if isinstance(condition, int):
+            condition = MaxEvaluations(condition)
+
+        if isinstance(condition, TerminationCondition):
+            condition.initialize(self)
+
+        last_log = self.nfe
+        start_time = time.time()
+
+        LOGGER.log(logging.INFO, "%s starting", type(self).__name__)
+
+        while not condition(self):
+            self.step()
+            if self.log_frequency is not None and self.nfe >= last_log + self.log_frequency:
+                nondominated_solutions = nondominated(self.result)
+                out = str(self.nfe)+" "
+                for solution in nondominated_solutions:
+                    out += str(solution.objectives)+";"
+                LOGGER.log(logging.INFO, out)
+                last_log = self.nfe
+
+            if callback is not None:
+                callback(self)
+            self.nfe += 1
+
+        LOGGER.log(logging.INFO,
+                   "%s finished; Total NFE: %d, Elapsed Time: %s",
+                   type(self).__name__,
+                   self.nfe,
+                   datetime.timedelta(seconds=time.time() - start_time))
