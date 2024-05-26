@@ -25,5 +25,5 @@ if __name__ == "__main__":
     # BaseFunctionality.Display.plot_yield()
     needs =  Helper.get_need_from_plantlist(create_plant_list())
     for need in needs:
-        print(Helper.nutrition_to_cost(need))
+        print(need.dir.values())
 

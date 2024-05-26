@@ -43,6 +43,8 @@ def single_cell(time_multiplier, step_number, nut):
                 diff = available - guideline
                 fert = need - diff
                 cost = Helper.nutrition_to_cost(fert)
+                if cost <= 0:
+                    cost = 1
                 ratio = plant_yields[i] / cost
                 if ratio > best_ratio:
                     plants[x][y] = plant_list[0][(i, 0)]
@@ -56,7 +58,7 @@ def single_cell(time_multiplier, step_number, nut):
     print("     Starting simulation at " + str(datetime.datetime.now().time()))
     G = Grid.Grid(new, plants)
     G.to_fertilize = True
-    G.fertilizer = fertelizer / step_number
+    G.fertilizer = fertelizer * time_multiplier / step_number
     for i in range(step_number):
         G.step(time_multiplier)
     nutrition_error = 0
@@ -98,6 +100,8 @@ def grid(time_multiplier, step_number, nut):
         fertilizer = NutritionTable()
         fertilizer = need - diff
         cost = Helper.nutrition_to_cost(fertilizer)
+        if cost <= 0:
+            cost = 1
         ratio = plant_yields[i] / cost
         if ratio > best_ratio:
             plant = i
@@ -109,7 +113,7 @@ def grid(time_multiplier, step_number, nut):
     print("     Starting simulation at " + str(datetime.datetime.now().time()))
     G = Grid.Grid(reversed_nutrition, plants)
     G.to_fertilize = True
-    G.fertilizer = best_fertelizer / step_number
+    G.fertilizer = best_fertelizer * time_multiplier / step_number
     for i in range(step_number):
         G.step(time_multiplier)
     nutrition_error = 0
@@ -131,8 +135,8 @@ if __name__ == "__main__":
     file = tk.filedialog.askopenfilename(title="Select Nutrition-File")
     with open(file) as f:
         nut = json.load(f)
-    timeMult = GlobalConfig.time_mult
-    stepNum = GlobalConfig.max_steps
+    timeMult = 1
+    stepNum = 250
     GlobalConfig.log_yield = True
     GlobalConfig.log_growth = True
     GlobalConfig.log_nutrition = False

@@ -12,7 +12,7 @@ class Plant:
     harvest = -1
     nutritionNeed = NutritionTable()
 
-    def step(self, time_multiplier, nutritions):
+    def step(self, time_multiplier, growth):
 
 
         try:
@@ -24,21 +24,16 @@ class Plant:
         except:
             js = {GlobalConfig.global_step_char: []}
         if self.timeToGrow >= 0:
-            rate = nutritions.get_min_rate(self.nutritionNeed * time_multiplier)
-            if rate * time_multiplier >= self.timeToGrow:
-                rate = self.timeToGrow / time_multiplier
-            rate = min(rate, 1)
-            self.timeToGrow -= rate * time_multiplier
-            js[GlobalConfig.global_step_char].append(rate)
+            self.timeToGrow -= growth * time_multiplier
+            js[GlobalConfig.global_step_char].append(growth)
         else:
-            rate = 0
+            growth = 0
             js[GlobalConfig.global_step_char].append(0)
 
         if GlobalConfig.log_growth:
             with open(GlobalConfig.log_path + "/growth.json", "w") as f:
                 json.dump(js, f)
 
-        return self.nutritionNeed * time_multiplier * rate
 
     def full_init(self, args):
         if len(args) == 1:

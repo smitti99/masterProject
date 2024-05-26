@@ -16,8 +16,14 @@ class Grid:
     l_nutrition = GlobalConfig.log_nutrition
     l_yield = GlobalConfig.log_yield
     Config_path = GlobalConfig.log_path
+    first_step = True
 
     def step(self, time_multiplier):
+        if self.first_step :
+            self.first_step = False
+            for key in self.fertilizer.dir.keys():
+                if self.fertilizer.dir[key] <= 0:
+                    self.fertilizer.dir[key] = 0
         if self.l_nutrition:
             self.log_nutrition()
         if self.l_yield:
@@ -40,13 +46,17 @@ class Grid:
         return nutrition
 
     def absorb_nutrition(self, pos, distance, nutrition):
-        nut_per_cell = nutrition / math.pow(2 * distance + 1, 2)
-        nutrition -= self.absorb_nutrition_helper(pos, distance, nut_per_cell)
+        nutrition_left = NutritionTable()
+        nutrition_left.dir = nutrition.dir.copy()
+        num_cells = math.pow(2 * distance + 1, 2)
         for x in range(pos[0] - distance, pos[0] + distance + 1):
             for y in range(pos[1] - distance, pos[1] + distance + 1):
                 if x < 0 or y < 0 or x >= len(self.cells) or y >= len(self.cells):
+                    num_cells -= 1
                     continue
-                nutrition -= self.cells[x][y].nutrition.absorb(nutrition)
+        nut_per_cell = nutrition_left / num_cells
+        nutrition_left -= self.absorb_nutrition_helper(pos, distance, nut_per_cell)
+        return nutrition_left
 
     def absorb_nutrition_helper(self, pos, distance, nutrition):
         absorbed = NutritionTable()

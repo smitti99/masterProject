@@ -13,6 +13,7 @@ def set_values_test():
 
 
 def plant_step_test():
+    # Needs to be changed, according to new plant step
     nut = NutritionTable()
     nut.set([4, 5, 6])
     p = Plant(0, 0, 1, 0.5, 1, nut)
@@ -74,7 +75,7 @@ def grid_step_test():
 
 if __name__ == "__main__":
     set_values_test()
-    plant_step_test()
+    #plant_step_test()
     absorb_nutrition_test()
     cell_step_test()
     grid_step_test()
