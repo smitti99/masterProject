@@ -25,7 +25,7 @@ if __name__ == "__main__":
     Logger = logging.getLogger("Platypus")
     log_path = os.path.join(base_path, "EA_Logs.txt")
     if not os.path.exists(log_path):
-        with open('/tmp/test', 'w'): pass
+        with open(log_path, 'w'): pass
     logging.basicConfig(filename=log_path, encoding='utf-8', level=logging.INFO)
     root = tk.Tk()
     root.withdraw()
@@ -43,7 +43,7 @@ if __name__ == "__main__":
 
     print("Starting run at " + str(datetime.datetime.now().time()))
     # optimize the problem using 10,000 function evaluations
-    algorithm.log_frequency = 100
+    algorithm.log_frequency = 0
     algorithm.run(10000)
     print("finished run at " + str(datetime.datetime.now().time()))
     # display the results
