@@ -24,6 +24,8 @@ if __name__ == "__main__":
     base_path = sys.argv[1]
     Logger = logging.getLogger("Platypus")
     log_path = os.path.join(base_path, "EA_Logs.txt")
+    if not os.path.exists(log_path):
+        with open('/tmp/test', 'w'): pass
     logging.basicConfig(filename=log_path, encoding='utf-8', level=logging.INFO)
     root = tk.Tk()
     root.withdraw()
@@ -61,4 +63,4 @@ if __name__ == "__main__":
     print(objectives)
     with open(os.path.join(base_path, "EA-Result.json"), "w") as f:
         json.dump({"result": objectives}, f)
-    plt.show()
+    plt.savefig('EA.png')
