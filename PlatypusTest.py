@@ -63,4 +63,4 @@ if __name__ == "__main__":
     print(objectives)
     with open(os.path.join(base_path, "EA-Result.json"), "w") as f:
         json.dump({"result": objectives}, f)
-    plt.savefig('EA.png')
+    plt.show()
