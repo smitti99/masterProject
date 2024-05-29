@@ -13,9 +13,9 @@ import platypus
 
 from EA import EA_Problem, Crossover
 from platypus import NSGAII, Problem, Real, DTLZ2, nondominated
-import tkinter as tk
-from tkinter import filedialog
-from tkinter.filedialog import askdirectory
+#import tkinter as tk
+#from tkinter import filedialog
+#from tkinter.filedialog import askdirectory
 
 import GlobalConfig
 from EA.EA_Problem import personal_NSGAII
@@ -27,8 +27,8 @@ if __name__ == "__main__":
     if not os.path.exists(log_path):
         with open(log_path, 'w'): pass
     logging.basicConfig(filename=log_path, encoding='utf-8', level=logging.INFO)
-    root = tk.Tk()
-    root.withdraw()
+    #root = tk.Tk()
+    #root.withdraw()
     file = os.path.join(base_path, 'Nutritions.json')
     with open(file) as f:
         nut = json.load(f)
@@ -41,14 +41,12 @@ if __name__ == "__main__":
     # instantiate the optimization algorithm
     algorithm = personal_NSGAII(problem, population_size=1000, variator=Crossover.row_cross(2))
 
-    print("Starting run at " + str(datetime.datetime.now().time()))
+    Logger.log(logging.INFO,"Starting at: "+str(datetime.datetime.now().time()))
     # optimize the problem using 10,000 function evaluations
-    algorithm.log_frequency = 0
-    algorithm.run(10000)
-    print("finished run at " + str(datetime.datetime.now().time()))
-    # display the results
-
-    matplotlib.use('TkAgg')
+    algorithm.log_frequency = 1000
+    algorithm.run(1000)
+    Logger.log(logging.INFO,"finished run at " + str(datetime.datetime.now().time()))
+    # display the resul
     fig = plt.figure()
 
     result = algorithm.result
@@ -63,4 +61,4 @@ if __name__ == "__main__":
     print(objectives)
     with open(os.path.join(base_path, "EA-Result.json"), "w") as f:
         json.dump({"result": objectives}, f)
-    plt.show()
+    plt.savefig(os.path.join(base_path,"EA.png"))

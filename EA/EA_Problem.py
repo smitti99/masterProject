@@ -4,7 +4,7 @@ import gc
 import logging
 import random
 import time
-from tkinter.filedialog import askdirectory
+#from tkinter.filedialog import askdirectory
 
 from platypus import Problem, Integer, Real, NSGAII, RandomGenerator, TournamentSelector, MaxEvaluations, \
     TerminationCondition, nondominated
