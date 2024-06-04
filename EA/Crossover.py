@@ -41,7 +41,8 @@ class row_cross(Variator):
         row2 = numpy.random.randint(0, rows)
         child1.variables[rows * row1:rows * (row1 + 1)] = parents[1].variables[rows * row2:rows * (row2 + 1)]
         child2.variables[rows * row2:rows * (row2 + 1)] = parents[0].variables[rows * row1:rows * (row1 + 1)]
-
+        child1.evaluated = False
+        child2.evaluated = False
         return [child1, child2]
 
 

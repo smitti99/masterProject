@@ -1,10 +1,12 @@
 import copy
 import datetime
 import gc
+import json
 import logging
+import os
 import random
 import time
-#from tkinter.filedialog import askdirectory
+# from tkinter.filedialog import askdirectory
 
 from platypus import Problem, Integer, Real, NSGAII, RandomGenerator, TournamentSelector, MaxEvaluations, \
     TerminationCondition, nondominated
@@ -77,8 +79,9 @@ class personal_NSGAII(NSGAII):
                  archive=None,
                  **kwargs):
         super().__init__(problem, population_size, generator, selector, variator, archive, **kwargs)
+        self.iteration = 0
 
-    def run(self, condition, callback=None):
+    def run(self, condition, log_path, callback=None):
         LOGGER = logging.getLogger("Platypus")
         if isinstance(condition, int):
             condition = MaxEvaluations(condition)
@@ -86,25 +89,27 @@ class personal_NSGAII(NSGAII):
         if isinstance(condition, TerminationCondition):
             condition.initialize(self)
 
-        last_log = self.nfe
+        last_log = self.iteration
         start_time = time.time()
-
+        epoch_log = {}
         LOGGER.log(logging.INFO, "%s starting", type(self).__name__)
 
         while not condition(self):
             self.step()
-            if self.log_frequency is not None and self.nfe >= last_log + self.log_frequency:
+            if self.log_frequency is not None and self.iteration >= last_log + self.log_frequency:
                 nondominated_solutions = nondominated(self.result)
-                out = str(self.nfe)+" "
-                for solution in nondominated_solutions:
-                    out += str(solution.objectives)+";"
-                LOGGER.log(logging.INFO, out)
-                last_log = self.nfe
+                last_log = self.iteration
+                objectives = []
+                for s in nondominated_solutions:
+                    objectives.append([s.objectives[0], s.objectives[1], s.objectives[2]])
+                epoch_log.update({self.iteration: objectives})
 
             if callback is not None:
                 callback(self)
-            self.nfe += 1
+            self.iteration += 1
 
+        with open(os.path.join(log_path, "Epoch_Logs.json"), "w") as f:
+            json.dump(epoch_log, f)
         LOGGER.log(logging.INFO,
                    "%s finished; Total NFE: %d, Elapsed Time: %s",
                    type(self).__name__,
