@@ -2,14 +2,14 @@
 
 # Time format is D-HH:MM:SS (see "man sbatch")
 # Here we allow the job to run at most ten minutes
-#SBATCH --time=0-01:00:00
+#SBATCH --time=0-06:00:00
 
 # Run one task on one node
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 
 # Make 48 cores available to our task (otherwise defaults to 1)
-#SBATCH --cpus-per-task=48
+#SBATCH --cpus-per-task=4
 
 # Use any of the compute nodes in the 'all' partition
 #SBATCH --partition=all
@@ -18,6 +18,4 @@
 #SBATCH --output=job.out
 #SBATCH --error=job.err
 
-srun hostname
-srun nproc
 srun python PlatypusTest.py Logs/NoNutritions
