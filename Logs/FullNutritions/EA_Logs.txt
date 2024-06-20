@@ -1,0 +1,4 @@
+INFO:Platypus:Starting at: 10:41:18.061600
+INFO:Platypus:personal_NSGAII starting
+INFO:Platypus:personal_NSGAII finished; Total NFE: 10000, Elapsed Time: 1:43:28.050424
+INFO:Platypus:finished run at 12:24:46.380137
