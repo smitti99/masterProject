@@ -27,16 +27,17 @@ class random_crossover(Variator):
 
 class row_cross(Variator):
 
-    def __init__(self, arity):
+    def __init__(self, arity, years=1):
         super().__init__(arity)
         self.arity = arity
+        self.years = years
 
     def evolve(self, parents):
         child1 = copy.deepcopy(parents[0])
         child2 = copy.deepcopy(parents[1])
 
         nvars = child1.problem.nvars
-        rows = int(numpy.sqrt(nvars - 3))
+        rows = int(numpy.sqrt((nvars - (self.years * 3)) / self.years)) * self.years
         row1 = numpy.random.randint(0, rows)
         row2 = numpy.random.randint(0, rows)
         child1.variables[rows * row1:rows * (row1 + 1)] = parents[1].variables[rows * row2:rows * (row2 + 1)]
@@ -48,16 +49,17 @@ class row_cross(Variator):
 
 class col_cross(Variator):
 
-    def __init__(self, arity):
+    def __init__(self, arity, years=1):
         super().__init__(arity)
         self.arity = arity
+        self.years = years
 
     def evolve(self, parents):
         child1 = copy.deepcopy(parents[0])
         child2 = copy.deepcopy(parents[1])
 
         nvars = child1.problem.nvars
-        col = numpy.sqrt(nvars - 3)
+        col = int(numpy.sqrt((nvars - (3 * self.years)) / self.years)) * self.years
         col1 = numpy.random.randint(0, col)
         col2 = numpy.random.randint(0, col)
         for i in range(col):
